@@ -1,20 +1,20 @@
 import React, { Component } from 'react'
 import styled from 'styled-components';
 import Text from '../components/Text';
+import Notification from '../components/Notification';
 import { formattedDate, addDays, subDays } from '../utils/dateFns';
+import { agendaBaseUrl, API_KEY } from '../utils/constants';
 
 const Heading = styled.div`
     padding: 16px;  
-    background-color: deepskyblue;
+    background-color: #6b8cc6;
     display: flex;
     align-items: center;
     justify-content: center;
 `;
-
 const Calendar = styled.div`
     padding: 16px;  
 `;
-
 const RowItem = styled.div`
     padding: 16px;
     display: flex;
@@ -34,16 +34,7 @@ const Timings = styled.div`
     display: flex;
     flex:1;
 `;
-const Notification = styled.div`
-    padding:16px;
-    color: red
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-`;
+
 
 class EventListPage extends Component {
   state = {
@@ -53,10 +44,6 @@ class EventListPage extends Component {
     isLoading: false,
   }
 
-  static getDerivedStateFromProps() {
-    // add all api data to eventList if not added
-  }
-
   componentDidMount() {
     this.fetchEventDetails(this.state.currentDate);
   }
@@ -64,23 +51,22 @@ class EventListPage extends Component {
   fetchEventDetails = (date) => {
     this.setState({ isLoading: true })
 
-    const url = `https://www.rijksmuseum.nl/api/en/agenda/${formattedDate(date)}?key=yW6uq3BV&format=json`; //store in constants
+    const url = `${agendaBaseUrl}/${formattedDate(date)}?key=${API_KEY}&format=json`; //store in constants
     fetch(url)
       .then((resp) => resp.json())
       .then((data) => {
         let events = data.options;
         this.setState({
-           events: events,
-           isLoading: false  
+          events: events,
+          isLoading: false
         });
         return events;
       })
       .catch((error) =>
-        // console.log(error, typeof(error))
-        this.setState({ 
+        this.setState({
           errorMessage: error.toString(),
-          isLoading: false 
-         })
+          isLoading: false
+        })
       );
   }
 
@@ -98,9 +84,7 @@ class EventListPage extends Component {
     this.fetchEventDetails(prevDate);
   }
 
-  renderEventItem = (event) => {
-    console.log({ event });
-    return (
+  renderEventItem = (event) => (
       <React.Fragment>
         <RowItem>
           <Timings>
@@ -116,10 +100,8 @@ class EventListPage extends Component {
         <hr />
       </React.Fragment>
     );
-  }
 
-  renderHeader = (date) => {
-    return (
+  renderHeader = (date) =>  (
       <Heading>
         <Text size="30px" color="white">{new Date(date).toDateString()}</Text>
         <Calendar>
@@ -128,22 +110,21 @@ class EventListPage extends Component {
         </Calendar>
       </Heading>
     );
-  }
 
   render() {
     const { currentDate, events, errorMessage, isLoading } = this.state;
-    console.log({ events, errorMessage, isLoading });
 
     if (errorMessage) {
       return (
-      <React.Fragment>
-        {this.renderHeader(currentDate)}
-        <Notification>{errorMessage}</Notification>
-      </React.Fragment>
+        <React.Fragment>
+          {this.renderHeader(currentDate)}
+          <Notification>{errorMessage}</Notification>
+        </React.Fragment>
       )
     }
     return (
       <React.Fragment>
+        {this.renderHeader(currentDate)}
         {isLoading ? <Notification>Loading...</Notification> : null}
         {
           events.length ?

@@ -1,8 +1,19 @@
+## Goal
+A Rijksmuseum clone app displaying upcoming events overview.
+
+## Demo
+View [Demo](http://royal-salt.surge.sh/) here
+
+## API
+This project uses data from the Rijksmuseum API(https://www.rijksmuseum.nl/api/en/agenda/)
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+## Scripts
 
-In the project directory, you can run:
+In the project directory, you can run below scripts:
+
+## `npm install`
+Installs all dependecies for this project.
 
 ### `npm start`
 
