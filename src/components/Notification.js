@@ -1,7 +1,7 @@
 import styled from 'styled-components'; 
 const Notification = styled.div`
     padding:16px;
-    color: red
+    color: red;
     display: flex;
     flex-direction: column;
     align-items: center;

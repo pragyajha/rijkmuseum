@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import styled from 'styled-components';
+import moment from 'moment-timezone';
 import Text from '../components/Text';
 import Notification from '../components/Notification';
 import { formattedDate, addDays, subDays } from '../utils/dateFns';
@@ -39,7 +40,7 @@ const Timings = styled.div`
 class EventListPage extends Component {
   state = {
     currentDate: new Date(),
-    events: [],
+    events: {},
     errorMessage: null,
     isLoading: false,
   }
@@ -50,12 +51,18 @@ class EventListPage extends Component {
 
   fetchEventDetails = (date) => {
     this.setState({ isLoading: true })
+    const { events } = this.state
+    if (events[date]) return
 
     const url = `${agendaBaseUrl}/${formattedDate(date)}?key=${API_KEY}&format=json`; //store in constants
     fetch(url)
       .then((resp) => resp.json())
       .then((data) => {
-        let events = data.options;
+        let newEvents = data.options;
+        let eventDate = moment(newEvents[0].date).tz(moment.tz.guess())
+        // let eventDate = newEvents[0].date.toLocaleString('en-US', { timeZone: moment.tz.guess() })
+        console.log('inside fetch date', formattedDate(eventDate))
+        events[formattedDate(eventDate)] = newEvents
         this.setState({
           events: events,
           isLoading: false
@@ -113,7 +120,6 @@ class EventListPage extends Component {
 
   render() {
     const { currentDate, events, errorMessage, isLoading } = this.state;
-
     if (errorMessage) {
       return (
         <React.Fragment>
@@ -122,13 +128,15 @@ class EventListPage extends Component {
         </React.Fragment>
       )
     }
+    const formattedCurrentDate = formattedDate(currentDate);
+    console.log('date', formattedCurrentDate, currentDate)
     return (
       <React.Fragment>
         {this.renderHeader(currentDate)}
         {isLoading ? <Notification>Loading...</Notification> : null}
         {
-          events.length ?
-            events.map((event) => this.renderEventItem(event))
+          events[formattedCurrentDate] && events[formattedCurrentDate].length ?
+            events[formattedCurrentDate].map((event) => this.renderEventItem(event))
             : <Notification>We have no events for today! Please select a different date</Notification>
         }
       </React.Fragment>
